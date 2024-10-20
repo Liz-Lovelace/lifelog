@@ -23,6 +23,12 @@ if (process.env.NODE_ENV === 'development') {
   }));
 }
 
+if (process.env.NODE_ENV === 'production') {
+  const buildPath = new URL('../dist', import.meta.url).pathname;
+  app.use(express.static(buildPath));
+}
+
+
 
 const authenticate = (req, res, next) => {
   const authString = req.cookies.lifelog_auth;
