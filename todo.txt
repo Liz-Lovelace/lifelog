@@ -15,7 +15,7 @@ GOALZ:
 - [x] input new records from frontend
 - [x] quick inbox from phone (and add auth to everything)
 - [-] add report
-- [ ] ship
+- [x] ship
 
 LATER:
 - [ ] sleepstart, sleepend, meal, masturbation categories
@@ -24,3 +24,7 @@ LATER:
 
 DEVLOG:
 - started at 18:00 20.10.2024
+- MVP done at 2:28 21.20.2024
+  - mobile http-shortcut input and simple web frontend
+  - auth
+  - timeline with 30-minute buckets and date dividers
