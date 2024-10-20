@@ -1,7 +1,7 @@
 import { createStore, applyMiddleware } from 'redux';
 import { thunk } from 'redux-thunk';
 
-let apiUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:4444' : 'https://lifelog.lizcel.com';
+let apiUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:4444' : 'https://lifelog.liz-lovelace.com';
 
 const initialState = {
   history: [],
