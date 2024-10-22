@@ -1,21 +1,5 @@
 TODO:
-- [x] get subdomain
-- [x] figure out fastest mobile option -> cookies might work with https shortcuts
-- [x] quick express server that writes a cookie and then console.logs it -> yep, mobile cookies are happening
-- [x] write server that serves simple sample lifelog entries
-- [x] write frontend that displays a simple timeline
-- [x] input events from frontend, save to backend, ~~update mechanism~~
-- [x] tunnel and try mobile
-- [x] simple auth for mobile+frontend
-
-
-GOALZ:
-- [x] Backend server that writes/gives lifelog records
-- [x] React/Redux frontend that displays lifelog as timeline
-- [x] input new records from frontend
-- [x] quick inbox from phone (and add auth to everything)
-- [-] add report
-- [x] ship
+- [ ] pretty timeline display, with intervals in minutes
 
 LATER:
 - [ ] sleepstart, sleepend, meal, masturbation categories

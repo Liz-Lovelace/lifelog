@@ -58,7 +58,7 @@ app.post('/login', async (req, res) => {
     httpOnly: true,
     secure: true,
     sameSite: 'strict',
-    maxAge: 400 * 24 * 60 * 60,
+    maxAge: 400 * 24 * 60 * 60 * 1000,
   })
 
   res.send('Logged in');

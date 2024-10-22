@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchHistory } from '../store/store';
 import moment from 'moment';
-import Chunk from './Chunk';
+import Timeline from './Timeline';
 import LoginInput from './LoginInput';
 import EventInput from './EventInput';
 
@@ -10,60 +10,70 @@ export default function App() {
   const dispatch = useDispatch();
   const history = useSelector((state) => state.history);
   const loadingHistory = useSelector((state) => state.loadingHistory);
-  let chunks = calculateChunks(history);
+  let timelineElements = [];
+  if (history.length > 0) {
+    timelineElements = composeTimeline(history);
+  }
 
   useEffect(() => {
     dispatch(fetchHistory());
   }, [dispatch]);
 
   return (
-    <div>
+    <>
       <LoginInput />
       <h1 style={{textAlign: 'center', margin: '1em'}}>LIFELOG</h1>
       <EventInput />
       {loadingHistory ? (
         <p>Loading history...</p>
       ) : (
-        <ul>
-          {chunks.map((chunk) => (
-            <Chunk key={`chunk-${chunk.type}-${chunk.start}`} chunk={chunk} />
-          ))}
-        </ul>
+        <Timeline timelineElements={timelineElements} />
       )}
-    </div>
+    </>
   );
 }
 
-function calculateChunks(history) {
-  const sortedHistory = [...history].sort((a, b) => b.timestamp - a.timestamp);
+function composeTimeline(_history) {
+  let history = addDayEvents(JSON.parse(JSON.stringify(_history)));
+  let sortedHistory = [...history].sort((a, b) => b.timestamp - a.timestamp);
 
-  let chunkSize = 30 * 60;
-  const chunks = [];
-  let timeIndex = moment().unix();
-  let lastChunkStart = timeIndex - (timeIndex % chunkSize);
-  let timeout = 10000;
-  let lastDay = '';
-  while (sortedHistory.length > 0 && timeout > 0) {
-    timeout -= 1;
-    let currentDay = moment.unix(lastChunkStart).format('DD.MM.YYYY (dddd, MMMM D)');
-    if (lastDay !== currentDay) {
-      lastDay = currentDay;
-      chunks.push({type: 'divider', title: lastDay, start: lastChunkStart});
+  let timeline = [];
+  for (let i = 0; i < sortedHistory.length; i++) {
+    let currentEvent = sortedHistory[i];
+    let nextEvent = sortedHistory[i + 1];
+
+    if (!currentEvent.eventType) {
+      currentEvent.eventType = 'default';
     }
-    let currentChunk = {type: 'container', events: [], start: lastChunkStart};
-    while (sortedHistory.length > 0 && timeout > 0) {
-      timeout -= 1
-      if (sortedHistory[0].timestamp >= lastChunkStart) {
-        currentChunk.events.push(sortedHistory.shift())
-      } else {
-        break;
-      }
+
+    timeline.push({type: 'event', event: currentEvent});
+
+    if (nextEvent) {
+      timeline.push({type: 'interval', key: currentEvent.uuid, duration: currentEvent.timestamp - nextEvent.timestamp});
     }
-    lastChunkStart -= chunkSize;
-    chunks.push(currentChunk);
   }
-  if (timeout <= 0) {
-    throw 'calculateChunks timeout';
+
+  return timeline;
+}
+
+function addDayEvents(history) {
+  if (history.length === 0) return [];
+
+  let days = new Set();
+  history.forEach(e => days.add(moment.unix(e.timestamp).endOf('day').unix()));
+
+  for (let dayTimestamp of days) {
+    history.push({
+      timestamp: dayTimestamp,
+      note: moment.unix(dayTimestamp).format('DD.MM.YYYY (dddd, MMMM D)'),
+      eventType: 'day-marker'
+    });
   }
-  return chunks;
+
+  let sortedHistory = [...history].sort((a, b) => b.timestamp - a.timestamp);
+
+  let firstNormalEvent = sortedHistory.find(e => e.eventType !== 'day-marker');
+  sortedHistory.find(e => e.eventType === 'day-marker').timestamp = firstNormalEvent.timestamp + 1;
+
+  return sortedHistory;
 }
